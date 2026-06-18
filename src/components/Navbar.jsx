@@ -8,7 +8,7 @@ const ChevronDown = ({ size = 16 }) => (
 );
 
 const MenuIcon = () => (
-  <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
     <line x1="3" y1="6" x2="21" y2="6" />
     <line x1="3" y1="12" x2="21" y2="12" />
     <line x1="3" y1="18" x2="21" y2="18" />
@@ -16,7 +16,7 @@ const MenuIcon = () => (
 );
 
 const CloseIcon = () => (
-  <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
@@ -243,7 +243,7 @@ const styles = `
     --elevox-subtle: rgba(240,242,245,0.22);
     --elevox-font-display: 'Space Grotesk', sans-serif;
     --elevox-font-body: 'Inter', sans-serif;
-    --elevox-nav-h: 68px;
+    --elevox-nav-h: 72px;
     --elevox-transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --elevox-transition-slow: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
@@ -284,15 +284,15 @@ const styles = `
   .elx-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     text-decoration: none;
     flex-shrink: 0;
-    margin-right: 36px;
+    margin-right: 40px;
   }
 
   .elx-logo-mark {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     position: relative;
     flex-shrink: 0;
   }
@@ -310,10 +310,11 @@ const styles = `
 
   .elx-logo-name {
     font-family: var(--elevox-font-display);
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--elevox-white);
     letter-spacing: -0.3px;
+    line-height: 1.1;
   }
 
   .elx-logo-name span {
@@ -321,12 +322,12 @@ const styles = `
   }
 
   .elx-logo-tagline {
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 400;
     color: var(--elevox-muted);
-    letter-spacing: 1.8px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    margin-top: 3px;
+    margin-top: 2px;
   }
 
   /* ── Nav Links ── */
@@ -346,13 +347,13 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
     cursor: pointer;
     background: none;
     border: none;
     font-family: var(--elevox-font-body);
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--elevox-muted);
     text-decoration: none;
@@ -389,9 +390,9 @@ const styles = `
   }
 
   .elx-btn-ghost {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 8px;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 500;
     font-family: var(--elevox-font-body);
     color: var(--elevox-muted);
@@ -409,9 +410,9 @@ const styles = `
   }
 
   .elx-btn-primary {
-    padding: 8px 20px;
+    padding: 9px 22px;
     border-radius: 8px;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 600;
     font-family: var(--elevox-font-body);
     color: #031a14;
@@ -646,15 +647,16 @@ const styles = `
     display: none;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
     border: 1px solid var(--elevox-border);
     background: none;
     cursor: pointer;
     color: var(--elevox-white);
     margin-left: 8px;
     transition: border-color var(--elevox-transition), background var(--elevox-transition);
+    padding: 0;
   }
 
   .elx-hamburger:hover {
@@ -812,8 +814,91 @@ const styles = `
     .elx-backdrop { display: none; }
   }
 
+  @media (max-width: 768px) {
+    .elx-logo-mark {
+      width: 38px;
+      height: 38px;
+    }
+
+    .elx-logo-name {
+      font-size: 20px;
+    }
+
+    .elx-logo-tagline {
+      font-size: 8.5px;
+      letter-spacing: 1.8px;
+    }
+
+    .elx-logo {
+      gap: 10px;
+      margin-right: 0;
+    }
+
+    .elx-nav-inner {
+      padding: 0 16px;
+    }
+
+    .elx-hamburger {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
   @media (max-width: 480px) {
-    .elx-logo-tagline { display: none; }
+    :root {
+      --elevox-nav-h: 64px;
+    }
+
+    .elx-logo-mark {
+      width: 34px;
+      height: 34px;
+    }
+
+    .elx-logo-name {
+      font-size: 18px;
+    }
+
+    .elx-logo-tagline {
+      display: none;
+    }
+
+    .elx-logo {
+      gap: 8px;
+    }
+
+    .elx-nav-inner {
+      padding: 0 12px;
+    }
+
+    .elx-hamburger {
+      width: 38px;
+      height: 38px;
+    }
+
+    .elx-mobile-drawer {
+      padding: 12px 16px 30px;
+    }
+
+    .elx-mobile-section-trigger {
+      font-size: 15px;
+      padding: 10px 2px;
+    }
+
+    .elx-mobile-sub-link {
+      font-size: 13px;
+      padding: 7px 10px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .elx-logo-mark {
+      width: 30px;
+      height: 30px;
+    }
+
+    .elx-logo-name {
+      font-size: 16px;
+    }
   }
 `;
 
