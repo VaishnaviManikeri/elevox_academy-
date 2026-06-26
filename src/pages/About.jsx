@@ -12,7 +12,9 @@ import {
   TrendingUp,
   Users,
   Shield,
-  Rocket
+  Rocket,
+  Award,
+  ChevronRight
 } from 'lucide-react';
 
 const About = () => {
@@ -81,7 +83,7 @@ const About = () => {
           </motion.p>
         </div>
 
-        {/* The Name Section */}
+        {/* The Name Section - Meaning Behind Elevox */}
         <motion.div 
           {...fadeInUp}
           transition={{ delay: 0.3 }}
@@ -116,7 +118,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Why Elevox Was Created */}
+        {/* Why Elevox Was Created & AI Skills Gap */}
         <motion.div 
           {...fadeInUp}
           transition={{ delay: 0.4 }}
@@ -149,7 +151,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Tier-2 Cities Section */}
+        {/* Why Tier-2 Cities Need AI Infrastructure */}
         <motion.div 
           {...fadeInUp}
           transition={{ delay: 0.5 }}
@@ -191,7 +193,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Vision & What Makes Us Different */}
+        {/* Vision & What Makes Elevox Different */}
         <motion.div 
           {...fadeInUp}
           transition={{ delay: 0.6 }}
@@ -245,7 +247,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Philosophy Section */}
+        {/* Philosophy Section - Where Intelligence Meets Purpose */}
         <motion.div 
           {...fadeInUp}
           transition={{ delay: 0.7 }}

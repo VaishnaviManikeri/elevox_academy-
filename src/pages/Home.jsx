@@ -3,22 +3,11 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 /* ============================================================
    ELEVOX — Home.jsx
    ------------------------------------------------------------
-   Design direction: a technology company shipping a career
-   product, not a coaching institute selling a course. The
-   brand name (ELEV-OX, "elevate" + signal/voltage) drives the
-   visual language: readouts, signal traces, terminal framing,
-   monospace data — instrumentation, not decoration.
-
-   Palette:
-     Void           #04090A  — base background
-     Panel          #0A1414  — raised surfaces
-     Circuit        #123230  — structural lines / borders
-     Signal         #1FE8B8  — primary accent (brighter than
-                                 the old emerald — reads as
-                                 "live", not "eco")
-     Phosphor       #B9FFE8  — hottest highlight, used sparingly
-     Amber          #FFB454  — the ONE warm accent, reserved for
-                                 "human" content (founders, CTA)
+   AI-ORIENTED DESIGN SYSTEM
+   Neural network aesthetics, particle fields, glow effects,
+   and data-stream animations. Every interaction feels like
+   interacting with an AI system — responsive, intelligent,
+   and alive with possibility.
    ============================================================ */
 
 const COLORS = {
@@ -28,6 +17,9 @@ const COLORS = {
   signal: "#1FE8B8",
   phosphor: "#B9FFE8",
   amber: "#FFB454",
+  neural: "#6C5CE7",
+  data: "#00D2FF",
+  quantum: "#FF6B6B",
 };
 
 /* ------------------------------------------------------------
@@ -138,6 +130,131 @@ const AUDIENCE_DATA = {
 };
 
 /* ------------------------------------------------------------
+   AI Themed Components
+------------------------------------------------------------ */
+
+// Neural Network Background
+function NeuralBackground() {
+  const canvasRef = useRef(null);
+  const particlesRef = useRef([]);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationRef = useRef();
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    const resize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const particles = [];
+    const numParticles = 80;
+    for (let i = 0; i < numParticles; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: Math.random() * 2 + 1,
+      });
+    }
+    particlesRef.current = particles;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Update particles
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+      });
+
+      // Draw connections
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            const opacity = (1 - dist / 150) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(31, 232, 184, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw particles with glow
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#1FE8B8';
+        ctx.shadowColor = '#1FE8B8';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      animationRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationRef.current);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="neural-bg" />;
+}
+
+// AI Pulse Animation
+function AIPulse({ children, active = true }) {
+  return (
+    <div className={`ai-pulse ${active ? 'is-active' : ''}`}>
+      <div className="ai-pulse__ring" />
+      <div className="ai-pulse__ring" style={{ animationDelay: '0.5s' }} />
+      <div className="ai-pulse__ring" style={{ animationDelay: '1s' }} />
+      {children}
+    </div>
+  );
+}
+
+// Data Stream Text Animation
+function DataStream({ text, className = '' }) {
+  const chars = text.split('');
+  return (
+    <span className={`data-stream ${className}`}>
+      {chars.map((char, i) => (
+        <span key={i} style={{ animationDelay: `${i * 0.05}s` }}>{char}</span>
+      ))}
+    </span>
+  );
+}
+
+// Glitch Effect Wrapper
+function GlitchText({ children, className = '' }) {
+  return (
+    <div className={`glitch-text ${className}`}>
+      <span className="glitch-text__main">{children}</span>
+      <span className="glitch-text__glitch" aria-hidden="true">{children}</span>
+      <span className="glitch-text__glitch2" aria-hidden="true">{children}</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------
    Small reusable bits
 ------------------------------------------------------------ */
 
@@ -161,26 +278,40 @@ function SectionShell({ id, eyebrow, title, sub, children, tone = "default", ind
 }
 
 /* ------------------------------------------------------------
-   Personalization Gate — framed as a calibration terminal.
-   Selecting a path doesn't just highlight a card later — it
-   rewrites the hero readout, the proof stats, and promotes a
-   track in the audience switcher.
+   Personalization Gate — AI-themed calibration terminal
 ------------------------------------------------------------ */
 function PersonalizationGate({ onSelect }) {
   const [active, setActive] = useState(null);
+  const [scanline, setScanline] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setScanline(v => (v + 2) % 100);
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="gate" role="dialog" aria-modal="true" aria-label="Choose your path">
-      <div className="gate__backdrop" />
+      <div className="gate__backdrop">
+        <div className="gate__scanline" style={{ top: `${scanline}%` }} />
+        <div className="gate__grid-overlay" />
+      </div>
       <div className="gate__panel">
         <div className="gate__panelHeader">
-          <span className="gate__dot" />
-          <span className="gate__headerText">ELEVOX // CALIBRATING VIEW</span>
+          <AIPulse active>
+            <span className="gate__dot" />
+          </AIPulse>
+          <span className="gate__headerText">
+            <DataStream text="ELEVOX // CALIBRATING VIEW" />
+          </span>
           <span className="gate__headerId">ID:0x{Math.floor(Math.random() * 9000 + 1000)}</span>
         </div>
 
         <div className="gate__body">
-          <p className="gate__kicker">Before we begin</p>
+          <p className="gate__kicker">
+            <span className="gate__kicker-dot">●</span> Neural calibration required
+          </p>
           <h1 className="gate__title">Who's reading this?</h1>
           <p className="gate__copy">
             Everything below — the proof, the tracks, the outcomes — will reorder
@@ -196,6 +327,7 @@ function PersonalizationGate({ onSelect }) {
                 onMouseLeave={() => setActive(null)}
                 onClick={() => onSelect(p.id)}
               >
+                <span className="gate__optionMarker">{active === p.id ? '▶' : '○'}</span>
                 <span className="gate__optionLabel">{p.label}</span>
                 <span className="gate__optionSub">{p.sub}</span>
                 <span className="gate__optionArrow" aria-hidden="true">→</span>
@@ -204,7 +336,7 @@ function PersonalizationGate({ onSelect }) {
           </div>
 
           <button className="gate__skip" onClick={() => onSelect("explore")}>
-            Skip calibration — show the full picture
+            <span className="gate__skip-icon">⟳</span> Skip calibration — show the full picture
           </button>
         </div>
       </div>
@@ -213,16 +345,7 @@ function PersonalizationGate({ onSelect }) {
 }
 
 /* ------------------------------------------------------------
-   Signature element: SIGNAL TRACE.
-   A persistent vertical line that runs the full height of the
-   page, rendered like an oscilloscope trace rather than a
-   plain progress bar. At each section boundary it logs a
-   readout label (TRACE_01 WHY-AI, TRACE_02 FOUNDERS, ...), so
-   the rail behaves like a system log of how far through the
-   "transformation" the visitor has travelled — input (raw
-   potential) at the top, output (employable) at the bottom.
-   This is the one bold, persistent motif tying the page
-   together, matching the brand's literal signal/voltage name.
+   Signature element: SIGNAL TRACE with AI enhancements
 ------------------------------------------------------------ */
 const RAIL_LOG = [
   "INPUT // RAW POTENTIAL",
@@ -241,6 +364,7 @@ const RAIL_LOG = [
 function SignalRail() {
   const railRef = useRef(null);
   const [activeLog, setActiveLog] = useState(0);
+  const [signalStrength, setSignalStrength] = useState(0);
 
   useEffect(() => {
     const sections = Array.from(document.querySelectorAll("[data-rail-section]"));
@@ -258,6 +382,9 @@ function SignalRail() {
         if (r.top < window.innerHeight * 0.6) idx = Number(el.dataset.railSection);
       });
       setActiveLog(Math.min(idx, RAIL_LOG.length - 1));
+      
+      // Simulate signal strength variation
+      setSignalStrength(Math.sin(Date.now() / 1000) * 0.3 + 0.7);
     };
     window.addEventListener("scroll", handle, { passive: true });
     window.addEventListener("resize", handle);
@@ -273,28 +400,55 @@ function SignalRail() {
       <div className="signalRail__track" />
       <div className="signalRail__fill" />
       <div className="signalRail__bead" />
-      <div className="signalRail__readout">{RAIL_LOG[activeLog]}</div>
+      <div className="signalRail__signal-glow" style={{ opacity: signalStrength * 0.5 }} />
+      <div className="signalRail__readout">
+        <span className="signalRail__readout-dot">●</span>
+        {RAIL_LOG[activeLog]}
+        <span className="signalRail__readout-strength">{Math.round(signalStrength * 100)}%</span>
+      </div>
     </div>
   );
 }
 
 /* ------------------------------------------------------------
-   Navbar + Hero
+   Navbar + Hero with AI animations
 ------------------------------------------------------------ */
 function Navbar({ onReset }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <nav className="navbar">
       <div className="hero__logo" onClick={onReset} role="button" tabIndex={0}>
         <span className="hero__logoMark">EX</span>
         <span className="hero__logoWord">ELEVOX</span>
+        <span className="hero__logoPulse" />
       </div>
       <div className="hero__navLinks">
-        <a href="#programmes">Programmes</a>
-        <a href="#founders">Founders</a>
-        <a href="#pathway">Outcomes</a>
-        <a href="#workshops">Workshops</a>
+        <a href="#why-ai" className="nav-link">
+          <span className="nav-link__indicator" />
+          Programmes
+        </a>
+        <a href="#founders" className="nav-link">
+          <span className="nav-link__indicator" />
+          Founders
+        </a>
+        <a href="#pathway" className="nav-link">
+          <span className="nav-link__indicator" />
+          Outcomes
+        </a>
+        <a href="#workshops" className="nav-link">
+          <span className="nav-link__indicator" />
+          Workshops
+        </a>
       </div>
-      <button className="hero__navCta">Talk to us</button>
+      <button 
+        className="hero__navCta"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <span className="hero__navCta-text">Talk to us</span>
+        {hovered && <span className="hero__navCta-wave">~~~</span>}
+      </button>
     </nav>
   );
 }
@@ -304,32 +458,54 @@ function Hero({ pathway }) {
     () => VISITOR_PATHS.find((p) => p.id === pathway) || VISITOR_PATHS[3],
     [pathway]
   );
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMove = (e) => {
+      setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    };
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
 
   return (
     <header className="hero" data-rail-section={0}>
       <div className="hero__bg">
         <div className="hero__image" style={{ backgroundImage: "url(/assets/images/hero.png)" }} />
         <div className="hero__grid" aria-hidden="true" />
+        <div className="hero__neural-glow" 
+          style={{ 
+            left: `${mousePos.x * 100}%`, 
+            top: `${mousePos.y * 100}%`,
+          }} 
+        />
       </div>
 
       <div className="hero__content">
         <div className="hero__statusRow">
-          <span className="hero__statusDot" />
-          <span className="hero__statusText">{path.heroKicker}</span>
+          <AIPulse active>
+            <span className="hero__statusDot" />
+          </AIPulse>
+          <span className="hero__statusText">
+            <DataStream text={path.heroKicker} />
+          </span>
         </div>
 
-        <h1 className="hero__headline">
+        <GlitchText className="hero__headline">
           AI is no longer optional.
           <br />
           <span className="hero__headlineAccent">Employability is.</span>
-        </h1>
+        </GlitchText>
+
         <p className="hero__sub">{path.heroLine}</p>
 
         <div className="hero__readout">
           {path.proof.map((item, i) => (
             <React.Fragment key={item.label}>
               <div className="hero__readoutItem">
-                <span className="hero__readoutNum">{item.num}</span>
+                <span className="hero__readoutNum">
+                  <DataStream text={item.num} />
+                </span>
                 <span className="hero__readoutLabel">{item.label}</span>
               </div>
               {i < path.proof.length - 1 && <div className="hero__readoutDivider" />}
@@ -338,13 +514,21 @@ function Hero({ pathway }) {
         </div>
 
         <div className="hero__ctaRow">
-          <button className="btn btn--primary">See your pathway</button>
-          <button className="btn btn--ghost">Watch the academy tour</button>
+          <button className="btn btn--primary">
+            <span className="btn__icon">⚡</span>
+            See your pathway
+          </button>
+          <button className="btn btn--ghost">
+            <span className="btn__icon">▶</span>
+            Watch the academy tour
+          </button>
         </div>
       </div>
 
       <div className="hero__scrollCue" aria-hidden="true">
-        <span />
+        <div className="hero__scrollLine">
+          <span className="hero__scrollDot" />
+        </div>
         Scroll — trace runs the full page
       </div>
     </header>
@@ -352,24 +536,34 @@ function Hero({ pathway }) {
 }
 
 /* ------------------------------------------------------------
-   Transition strip
+   Transition strip with AI theming
 ------------------------------------------------------------ */
 function HeroTransitionStrip() {
   return (
     <section className="heroStrip" aria-label="Elevox learning promise">
       <div className="heroStrip__inner">
-        <span className="heroStrip__label">01 · AI FLUENCY</span>
-        <span className="heroStrip__divider" aria-hidden="true" />
-        <span className="heroStrip__label">02 · INDUSTRY PROOF</span>
-        <span className="heroStrip__divider" aria-hidden="true" />
-        <span className="heroStrip__label">03 · CAREER OUTCOME</span>
+        <span className="heroStrip__label">
+          <span className="heroStrip__num">01</span> AI FLUENCY
+        </span>
+        <span className="heroStrip__divider" aria-hidden="true">
+          <span className="heroStrip__divider-dot">●</span>
+        </span>
+        <span className="heroStrip__label">
+          <span className="heroStrip__num">02</span> INDUSTRY PROOF
+        </span>
+        <span className="heroStrip__divider" aria-hidden="true">
+          <span className="heroStrip__divider-dot">●</span>
+        </span>
+        <span className="heroStrip__label">
+          <span className="heroStrip__num">03</span> CAREER OUTCOME
+        </span>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------
-   Secondary hero image
+   Secondary hero image with AI overlay
 ------------------------------------------------------------ */
 function SecondaryHeroImage() {
   return (
@@ -380,6 +574,13 @@ function SecondaryHeroImage() {
         role="img"
         aria-label="Elevox secondary hero visual"
       />
+      <div className="heroSecondary__overlay">
+        <div className="heroSecondary__scanline" />
+        <div className="heroSecondary__data-overlay">
+          <span className="heroSecondary__data-text">[AI_TRAINING_MATRIX]</span>
+          <span className="heroSecondary__data-text">[OPTIMIZATION: 87%]</span>
+        </div>
+      </div>
       <div className="heroSecondary__content">
         <Eyebrow>The transformation, not the tools</Eyebrow>
         <h2 className="heroSecondary__title">
@@ -396,11 +597,7 @@ function SecondaryHeroImage() {
 }
 
 /* ------------------------------------------------------------
-   1. Why AI Matters Now — framed as a system status readout,
-   not a stat-card grid. The numbers are bigger, the labels are
-   terse, and they sit on a single shared baseline like a
-   dashboard, because this section's job is to feel like a
-   warning light, not a brochure stat.
+   1. Why AI Matters Now — AI system status dashboard
 ------------------------------------------------------------ */
 function WhyAIMattersNow() {
   const points = [
@@ -408,6 +605,7 @@ function WhyAIMattersNow() {
     { stat: "3×", label: "faster skill obsolescence than the decade before" },
     { stat: "0", label: "industries left untouched by AI-driven restructuring" },
   ];
+
   return (
     <SectionShell
       id="why-ai"
@@ -416,26 +614,32 @@ function WhyAIMattersNow() {
       title="AI didn't knock. It already let itself in."
       sub="Every industry is being re-architected around AI-literate people. The question isn't whether you adapt — it's whether you adapt on your own terms, or someone else's."
     >
-      <div className="readoutBar">
-        {points.map((p, i) => (
-          <React.Fragment key={p.label}>
-            <div className="readoutBar__item">
-              <div className="readoutBar__stat">{p.stat}</div>
-              <div className="readoutBar__label">{p.label}</div>
-            </div>
-            {i < points.length - 1 && <div className="readoutBar__rule" aria-hidden="true" />}
-          </React.Fragment>
-        ))}
+      <div className="ai-dashboard">
+        <div className="ai-dashboard__header">
+          <span className="ai-dashboard__status">● SYSTEM STATUS: ACTIVE</span>
+          <span className="ai-dashboard__timestamp">[AI_READOUT_{new Date().getFullYear()}]</span>
+        </div>
+        <div className="readoutBar">
+          {points.map((p, i) => (
+            <React.Fragment key={p.label}>
+              <div className="readoutBar__item">
+                <div className="readoutBar__stat">{p.stat}</div>
+                <div className="readoutBar__label">{p.label}</div>
+                <div className="readoutBar__progress">
+                  <div className="readoutBar__progress-bar" style={{ width: `${Math.random() * 30 + 70}%` }} />
+                </div>
+              </div>
+              {i < points.length - 1 && <div className="readoutBar__rule" aria-hidden="true" />}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </SectionShell>
   );
 }
 
 /* ------------------------------------------------------------
-   2. Meet The Founders — dossier framing instead of bio cards.
-   Industry credibility is the claim, so the layout reads like
-   a credentials file: a monospace "ledger" of roles and scars,
-   not a circular-avatar card grid.
+   2. Meet The Founders — AI dossier with neural connections
 ------------------------------------------------------------ */
 function MeetTheFounders() {
   const founders = [
@@ -466,7 +670,9 @@ function MeetTheFounders() {
         {founders.map((f) => (
           <div className="dossierCard" key={f.name}>
             <div className="dossierCard__top">
-              <div className="dossierCard__id" aria-hidden="true" />
+              <div className="dossierCard__id">
+                <div className="dossierCard__id-pulse" />
+              </div>
               <div className="dossierCard__heading">
                 <h3 className="dossierCard__name">{f.name}</h3>
                 <p className="dossierCard__role">{f.role}</p>
@@ -476,9 +682,17 @@ function MeetTheFounders() {
             <p className="dossierCard__bio">{f.bio}</p>
             <ul className="dossierCard__scars">
               {f.scars.map((s) => (
-                <li key={s}>{s}</li>
+                <li key={s}>
+                  <span className="dossierCard__scar-icon">▶</span>
+                  {s}
+                </li>
               ))}
             </ul>
+            <div className="dossierCard__neural">
+              <span className="dossierCard__neural-dot" />
+              <span className="dossierCard__neural-dot" />
+              <span className="dossierCard__neural-dot" />
+            </div>
           </div>
         ))}
       </div>
@@ -487,10 +701,7 @@ function MeetTheFounders() {
 }
 
 /* ------------------------------------------------------------
-   3. Industry Problem & Opportunity — rendered as a two-column
-   ledger with a shared center divider, like a balance sheet:
-   liability vs. asset. This makes the gap feel measured, not
-   just asserted.
+   3. Industry Problem & Opportunity — AI balance sheet
 ------------------------------------------------------------ */
 function IndustryProblemOpportunity() {
   return (
@@ -503,7 +714,9 @@ function IndustryProblemOpportunity() {
     >
       <div className="ledger">
         <div className="ledger__col ledger__col--problem">
-          <span className="ledger__tag">LIABILITY</span>
+          <span className="ledger__tag">
+            <span className="ledger__tag-icon">⚠</span> LIABILITY
+          </span>
           <h3 className="ledger__heading">The problem</h3>
           <p className="ledger__text">
             Most AI training ends at certificates and tool tutorials. Learners leave knowing
@@ -511,9 +724,13 @@ function IndustryProblemOpportunity() {
             business problem.
           </p>
         </div>
-        <div className="ledger__spine" aria-hidden="true" />
+        <div className="ledger__spine" aria-hidden="true">
+          <div className="ledger__spine-pulse" />
+        </div>
         <div className="ledger__col ledger__col--opportunity">
-          <span className="ledger__tag ledger__tag--accent">ASSET</span>
+          <span className="ledger__tag ledger__tag--accent">
+            <span className="ledger__tag-icon">✦</span> ASSET
+          </span>
           <h3 className="ledger__heading ledger__heading--accent">The opportunity</h3>
           <p className="ledger__text">
             The market doesn't have an AI knowledge shortage — it has an AI application
@@ -527,14 +744,14 @@ function IndustryProblemOpportunity() {
 }
 
 /* ------------------------------------------------------------
-   4. Programmes Overview
+   4. Programmes Overview with AI-themed cards
 ------------------------------------------------------------ */
 function ProgrammesOverview() {
   const programmes = [
-    { code: "PRG.01", name: "Foundations", desc: "Applied AI literacy for any background, in weeks not semesters." },
-    { code: "PRG.02", name: "Specialist Tracks", desc: "Role-specific depth — product, data, ops, engineering, design." },
-    { code: "PRG.03", name: "Capstone & Portfolio", desc: "Real briefs, real stakeholders, work you can show employers." },
-    { code: "PRG.04", name: "Workforce Cohorts", desc: "Team-wide rollouts built around your company's actual workflows." },
+    { code: "PRG.01", name: "Foundations", desc: "Applied AI literacy for any background, in weeks not semesters.", icon: "🧠" },
+    { code: "PRG.02", name: "Specialist Tracks", desc: "Role-specific depth — product, data, ops, engineering, design.", icon: "⚡" },
+    { code: "PRG.03", name: "Capstone & Portfolio", desc: "Real briefs, real stakeholders, work you can show employers.", icon: "📊" },
+    { code: "PRG.04", name: "Workforce Cohorts", desc: "Team-wide rollouts built around your company's actual workflows.", icon: "🏢" },
   ];
   return (
     <SectionShell
@@ -547,9 +764,13 @@ function ProgrammesOverview() {
       <div className="grid grid--4">
         {programmes.map((p) => (
           <div className="programmeCard" key={p.name}>
-            <span className="programmeCard__code">{p.code}</span>
+            <div className="programmeCard__icon">{p.icon}</div>
+            <span className="programmeCard__code">
+              <span className="programmeCard__code-dot">●</span> {p.code}
+            </span>
             <h3 className="programmeCard__name">{p.name}</h3>
             <p className="programmeCard__desc">{p.desc}</p>
+            <div className="programmeCard__glow" />
           </div>
         ))}
       </div>
@@ -558,12 +779,7 @@ function ProgrammesOverview() {
 }
 
 /* ------------------------------------------------------------
-   5. Audience Tracks — a tab-driven switcher rather than four
-   simultaneous cards with one "highlighted." This is the
-   section where personalization should be most visible: the
-   visitor's calibrated path opens pre-selected, and switching
-   tabs is the same gesture a returning visitor would use to
-   explore the others. One detail panel, not four boxes.
+   5. Audience Tracks — AI-enhanced switcher
 ------------------------------------------------------------ */
 function AudienceTracks({ pathway }) {
   const order = ["students", "professionals", "corporates", "colleges"];
@@ -594,7 +810,11 @@ function AudienceTracks({ pathway }) {
               onClick={() => setTab(id)}
             >
               <span className="switcher__tabLabel">{AUDIENCE_DATA[id].eyebrow.replace("For ", "")}</span>
-              {matched === id && <span className="switcher__tabBadge">Matched</span>}
+              {matched === id && (
+                <span className="switcher__tabBadge">
+                  <span className="switcher__tabBadge-dot">●</span> Matched
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -605,10 +825,16 @@ function AudienceTracks({ pathway }) {
           <p className="switcher__body">{active.body}</p>
           <ul className="switcher__list">
             {active.points.map((pt) => (
-              <li key={pt}>{pt}</li>
+              <li key={pt}>
+                <span className="switcher__list-icon">▸</span>
+                {pt}
+              </li>
             ))}
           </ul>
-          <button className="switcher__cta">{active.cta}</button>
+          <button className="switcher__cta">
+            <span className="switcher__cta-icon">⚡</span>
+            {active.cta}
+          </button>
         </div>
       </div>
     </SectionShell>
@@ -616,15 +842,14 @@ function AudienceTracks({ pathway }) {
 }
 
 /* ------------------------------------------------------------
-   6. Success Pathway — a genuine sequence, so numbering earns
-   its place here (unlike a generic feature grid).
+   6. Success Pathway — AI sequence
 ------------------------------------------------------------ */
 function SuccessPathway() {
   const steps = [
-    { n: "01", title: "Diagnose", desc: "Map where you stand against where the market is heading." },
-    { n: "02", title: "Build", desc: "Apply AI inside real briefs, not isolated tutorials." },
-    { n: "03", title: "Prove", desc: "Leave with a portfolio, not just a certificate." },
-    { n: "04", title: "Place", desc: "Get matched to roles or transformation outcomes." },
+    { n: "01", title: "Diagnose", desc: "Map where you stand against where the market is heading.", icon: "🔍" },
+    { n: "02", title: "Build", desc: "Apply AI inside real briefs, not isolated tutorials.", icon: "🏗️" },
+    { n: "03", title: "Prove", desc: "Leave with a portfolio, not just a certificate.", icon: "📈" },
+    { n: "04", title: "Place", desc: "Get matched to roles or transformation outcomes.", icon: "🎯" },
   ];
   return (
     <SectionShell
@@ -639,10 +864,18 @@ function SuccessPathway() {
           <React.Fragment key={s.n}>
             <div className="pathway__step">
               <span className="pathway__num">{s.n}</span>
+              <div className="pathway__icon">{s.icon}</div>
               <h3 className="pathway__title">{s.title}</h3>
               <p className="pathway__desc">{s.desc}</p>
+              <div className="pathway__progress">
+                <div className="pathway__progress-bar" style={{ width: `${(i + 1) * 25}%` }} />
+              </div>
             </div>
-            {i < steps.length - 1 && <div className="pathway__connector" aria-hidden="true" />}
+            {i < steps.length - 1 && (
+              <div className="pathway__connector" aria-hidden="true">
+                <div className="pathway__connector-dot" />
+              </div>
+            )}
           </React.Fragment>
         ))}
       </div>
@@ -651,13 +884,13 @@ function SuccessPathway() {
 }
 
 /* ------------------------------------------------------------
-   7. Placement & Career Outcomes
+   7. Placement & Career Outcomes — AI metrics
 ------------------------------------------------------------ */
 function PlacementOutcomes() {
   const outcomes = [
-    { stat: "87%", label: "learners who moved roles or got promoted within 6 months" },
-    { stat: "40+", label: "hiring & transformation partners in the network" },
-    { stat: "21 days", label: "average time from capstone to first interview" },
+    { stat: "87%", label: "learners who moved roles or got promoted within 6 months", trend: "+12%" },
+    { stat: "40+", label: "hiring & transformation partners in the network", trend: "+5" },
+    { stat: "21 days", label: "average time from capstone to first interview", trend: "-3d" },
   ];
   return (
     <SectionShell
@@ -671,7 +904,10 @@ function PlacementOutcomes() {
         {outcomes.map((o, i) => (
           <React.Fragment key={o.label}>
             <div className="readoutBar__item">
-              <div className="readoutBar__stat">{o.stat}</div>
+              <div className="readoutBar__stat">
+                <DataStream text={o.stat} />
+                <span className="readoutBar__trend">{o.trend}</span>
+              </div>
               <div className="readoutBar__label">{o.label}</div>
             </div>
             {i < outcomes.length - 1 && <div className="readoutBar__rule" aria-hidden="true" />}
@@ -683,13 +919,13 @@ function PlacementOutcomes() {
 }
 
 /* ------------------------------------------------------------
-   8. Upcoming Workshops
+   8. Upcoming Workshops — AI schedule
 ------------------------------------------------------------ */
 function UpcomingWorkshops() {
   const workshops = [
-    { date: "08 JUL", title: "Applied AI for Product Teams", mode: "Live · Online" },
-    { date: "15 JUL", title: "AI Readiness Audit for Leaders", mode: "Live · Mumbai" },
-    { date: "22 JUL", title: "From Tutorials to Portfolios", mode: "Live · Online" },
+    { date: "08 JUL", title: "Applied AI for Product Teams", mode: "Live · Online", status: "active" },
+    { date: "15 JUL", title: "AI Readiness Audit for Leaders", mode: "Live · Mumbai", status: "upcoming" },
+    { date: "22 JUL", title: "From Tutorials to Portfolios", mode: "Live · Online", status: "upcoming" },
   ];
   return (
     <SectionShell
@@ -702,10 +938,16 @@ function UpcomingWorkshops() {
       <div className="workshopList">
         {workshops.map((w) => (
           <div className="workshopRow" key={w.title}>
-            <span className="workshopRow__date">{w.date}</span>
+            <span className="workshopRow__date">
+              <span className="workshopRow__date-dot" />
+              {w.date}
+            </span>
             <span className="workshopRow__title">{w.title}</span>
             <span className="workshopRow__mode">{w.mode}</span>
-            <button className="workshopRow__cta">Reserve seat</button>
+            <button className="workshopRow__cta">
+              <span className="workshopRow__cta-icon">✦</span>
+              Reserve seat
+            </button>
           </div>
         ))}
       </div>
@@ -714,7 +956,7 @@ function UpcomingWorkshops() {
 }
 
 /* ------------------------------------------------------------
-   9. Academy Tour Preview
+   9. Academy Tour Preview — AI hologram
 ------------------------------------------------------------ */
 function AcademyTourPreview() {
   return (
@@ -726,30 +968,58 @@ function AcademyTourPreview() {
       sub="Take a 90-second walk through the studios, mentor pods, and capstone labs before you visit in person."
     >
       <div className="tourPanel">
+        <div className="tourPanel__hologram">
+          <div className="tourPanel__hologram-grid" />
+          <div className="tourPanel__hologram-pulse" />
+        </div>
         <div className="tourPanel__playGlow" />
-        <button className="tourPanel__playBtn" aria-label="Play academy tour video">▶</button>
+        <button className="tourPanel__playBtn" aria-label="Play academy tour video">
+          <span className="tourPanel__playIcon">▶</span>
+        </button>
         <span className="tourPanel__caption">90-second academy walkthrough</span>
+        <div className="tourPanel__data-feed">
+          <span className="tourPanel__data-item">[STUDIO_1: ACTIVE]</span>
+          <span className="tourPanel__data-item">[CAPSTONE_LAB: READY]</span>
+          <span className="tourPanel__data-item">[MENTOR_POD: 4/6 CONNECTED]</span>
+        </div>
       </div>
     </SectionShell>
   );
 }
 
 /* ------------------------------------------------------------
-   10. Call To Action
+   10. Call To Action — AI recruitment
 ------------------------------------------------------------ */
 function CallToAction() {
   return (
     <section className="cta" data-rail-section={10}>
+      <div className="cta__neural-bg">
+        <div className="cta__neural-particle" />
+        <div className="cta__neural-particle" style={{ animationDelay: '2s' }} />
+        <div className="cta__neural-particle" style={{ animationDelay: '4s' }} />
+      </div>
       <div className="cta__inner">
-        <Eyebrow tone="amber">Start here</Eyebrow>
+        <Eyebrow tone="amber">
+          <span className="cta__eyebrow-icon">✦</span> Start here
+        </Eyebrow>
         <h2 className="cta__title">Learning ends at a certificate. Ours ends at a job.</h2>
         <p className="cta__sub">
           Tell us where you stand, and we'll show you the shortest real path from here to
           employable, promotable, or transformation-ready.
         </p>
         <div className="cta__row">
-          <button className="btn btn--primary btn--lg">Map my pathway</button>
-          <button className="btn btn--ghost btn--lg">Talk to a founder</button>
+          <button className="btn btn--primary btn--lg">
+            <span className="btn__icon">⚡</span>
+            Map my pathway
+          </button>
+          <button className="btn btn--ghost btn--lg">
+            <span className="btn__icon">◇</span>
+            Talk to a founder
+          </button>
+        </div>
+        <div className="cta__ai-status">
+          <span className="cta__ai-dot">●</span>
+          AI calibration complete — ready for your pathway
         </div>
       </div>
     </section>
@@ -757,22 +1027,41 @@ function CallToAction() {
 }
 
 /* ------------------------------------------------------------
-   Footer
+   Footer with AI branding
 ------------------------------------------------------------ */
 function Footer() {
   return (
     <footer className="footer">
+      <div className="footer__neural-line" />
       <div className="footer__inner">
         <div className="footer__brand">
           <span className="hero__logoMark">EX</span>
           <span className="hero__logoWord">ELEVOX</span>
+          <span className="footer__brand-ai">[AI_POWERED]</span>
         </div>
         <p className="footer__tag">The bridge between learning AI and being employable because of it.</p>
         <div className="footer__links">
-          <a href="#programmes">Programmes</a>
-          <a href="#founders">Founders</a>
-          <a href="#pathway">Outcomes</a>
-          <a href="#workshops">Workshops</a>
+          <a href="#programmes">
+            <span className="footer__link-icon">▸</span>
+            Programmes
+          </a>
+          <a href="#founders">
+            <span className="footer__link-icon">▸</span>
+            Founders
+          </a>
+          <a href="#pathway">
+            <span className="footer__link-icon">▸</span>
+            Outcomes
+          </a>
+          <a href="#workshops">
+            <span className="footer__link-icon">▸</span>
+            Workshops
+          </a>
+        </div>
+        <div className="footer__ai-metrics">
+          <span>AI_READY: 100%</span>
+          <span>OPTIMIZATION: ACTIVE</span>
+          <span>CONNECTION: SECURE</span>
         </div>
       </div>
     </footer>
@@ -801,6 +1090,7 @@ export default function Home() {
 
       {gateOpen && <PersonalizationGate onSelect={handleSelect} />}
 
+      <NeuralBackground />
       <SignalRail />
       <Navbar onReset={handleReset} />
       <Hero pathway={pathway} />
@@ -833,6 +1123,9 @@ const STYLES = `
   --signal: ${COLORS.signal};
   --phosphor: ${COLORS.phosphor};
   --amber: ${COLORS.amber};
+  --neural: ${COLORS.neural};
+  --data: ${COLORS.data};
+  --quantum: ${COLORS.quantum};
   --text-primary: #EAF6F2;
   --text-secondary: #93B3AC;
   --text-muted: #51716A;
@@ -870,7 +1163,89 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   .elevox * { animation: none !important; transition: none !important; }
 }
 
-/* ---------- Eyebrow / labels ---------- */
+/* ---------- Neural Background ---------- */
+.neural-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ---------- AI Pulse ---------- */
+.ai-pulse {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.ai-pulse__ring {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--signal);
+  border-radius: 50%;
+  opacity: 0;
+  animation: pulseRing 2s ease-out infinite;
+}
+@keyframes pulseRing {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+.ai-pulse.is-active .ai-pulse__ring {
+  animation-play-state: running;
+}
+
+/* ---------- Data Stream ---------- */
+.data-stream span {
+  display: inline-block;
+  opacity: 0;
+  animation: dataStream 0.5s forwards;
+}
+@keyframes dataStream {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Glitch Text ---------- */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+.glitch-text__main {
+  position: relative;
+  z-index: 1;
+}
+.glitch-text__glitch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  color: var(--data);
+  animation: glitch1 3s infinite;
+}
+.glitch-text__glitch2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  color: var(--quantum);
+  animation: glitch2 3s infinite;
+}
+@keyframes glitch1 {
+  0%, 95%, 100% { transform: translate(0); opacity: 0; }
+  96% { transform: translate(-2px, 1px); opacity: 0.7; }
+  97% { transform: translate(2px, -1px); opacity: 0.7; }
+}
+@keyframes glitch2 {
+  0%, 97%, 100% { transform: translate(0); opacity: 0; }
+  98% { transform: translate(2px, -2px); opacity: 0.7; }
+  99% { transform: translate(-2px, 1px); opacity: 0.7; }
+}
+
+/* ---------- Eyebrow ---------- */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -881,7 +1256,7 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 }
 .eyebrow--amber { color: var(--amber); }
 
-/* ---------- Signal Rail (signature element) ---------- */
+/* ---------- Signal Rail ---------- */
 .signalRail {
   position: fixed;
   top: 0;
@@ -921,6 +1296,16 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   transform: translateY(-50%);
   transition: top 0.08s linear;
 }
+.signalRail__signal-glow {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  width: 40px;
+  height: 100px;
+  background: radial-gradient(ellipse, rgba(31,232,184,0.2), transparent 70%);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
 .signalRail__readout {
   position: absolute;
   left: -10px;
@@ -931,8 +1316,20 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   letter-spacing: 0.08em;
   color: var(--text-muted);
   white-space: nowrap;
-  padding-right: 4px;
+  padding-right: 8px;
   transition: top 0.08s linear;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.signalRail__readout-dot {
+  color: var(--signal);
+  font-size: 6px;
+}
+.signalRail__readout-strength {
+  font-size: 8px;
+  color: var(--phosphor);
+  opacity: 0.7;
 }
 
 /* ---------- Navbar ---------- */
@@ -949,7 +1346,13 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background: var(--void);
   border-bottom: 1px solid rgba(31,232,184,0.08);
 }
-.hero__logo { display: flex; align-items: baseline; gap: 8px; cursor: pointer; }
+.hero__logo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
 .hero__logoMark {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -959,6 +1362,22 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   padding: 4px 7px;
   border-radius: 4px;
   font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+.hero__logoMark::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: logoShine 3s infinite;
+}
+@keyframes logoShine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
 }
 .hero__logoWord {
   font-family: var(--font-display);
@@ -966,9 +1385,37 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   font-size: 19px;
   letter-spacing: 0.02em;
 }
-.hero__navLinks { display: none; gap: 36px; font-size: 14px; color: var(--text-secondary); }
+.hero__logoPulse {
+  position: absolute;
+  right: -12px;
+  top: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--signal);
+  border-radius: 50%;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+.hero__navLinks {
+  display: none;
+  gap: 36px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
 @media (min-width: 900px) { .hero__navLinks { display: flex; } }
-.hero__navLinks a:hover { color: var(--phosphor); }
+.nav-link {
+  position: relative;
+  padding: 4px 0;
+}
+.nav-link__indicator {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--signal);
+  transition: width 0.3s ease;
+}
+.nav-link:hover .nav-link__indicator { width: 100%; }
 .hero__navCta {
   font-size: 13px;
   font-family: var(--font-mono);
@@ -977,8 +1424,21 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border-radius: 999px;
   color: var(--phosphor);
   transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.hero__navCta:hover { background: rgba(31,232,184,0.1); border-color: var(--signal); }
+.hero__navCta:hover {
+  background: rgba(31,232,184,0.1);
+  border-color: var(--signal);
+}
+.hero__navCta-wave {
+  animation: wave 0.5s ease-in-out;
+}
+@keyframes wave {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
 
 /* ---------- Hero ---------- */
 .hero {
@@ -990,7 +1450,12 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   overflow: hidden;
   isolation: isolate;
 }
-.hero__bg { position: absolute; inset: 0; z-index: 0; background: var(--void); }
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--void);
+}
 .hero__image {
   position: absolute;
   inset: 0;
@@ -1007,6 +1472,17 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
     linear-gradient(90deg, rgba(31,232,184,0.05) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 80% 60% at 70% 30%, black, transparent 70%);
+}
+.hero__neural-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(31,232,184,0.15), transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  filter: blur(20px);
 }
 
 .hero__content {
@@ -1027,12 +1503,12 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   margin-bottom: 22px;
 }
 .hero__statusDot {
-  width: 7px; height: 7px; border-radius: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background: var(--signal);
   box-shadow: 0 0 8px var(--signal);
-  animation: pulseDot 2.2s ease-in-out infinite;
 }
-@keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .hero__statusText {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1047,6 +1523,7 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   line-height: 1.08;
   letter-spacing: -0.01em;
   margin: 0 0 20px;
+  position: relative;
 }
 .hero__headlineAccent { color: var(--signal); }
 
@@ -1066,7 +1543,13 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border-top: 1px solid rgba(31,232,184,0.16);
   padding-top: 22px;
 }
-.hero__readoutItem { display: flex; flex-direction: column; gap: 4px; min-width: 130px; max-width: 180px; }
+.hero__readoutItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+  max-width: 180px;
+}
 .hero__readoutNum {
   font-family: var(--font-mono);
   font-size: 22px;
@@ -1074,7 +1557,10 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   color: var(--text-primary);
 }
 .hero__readoutLabel { font-size: 12.5px; color: var(--text-muted); }
-.hero__readoutDivider { width: 1px; background: rgba(31,232,184,0.15); }
+.hero__readoutDivider {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(31,232,184,0.2), transparent);
+}
 
 .hero__ctaRow { display: flex; gap: 14px; flex-wrap: wrap; }
 
@@ -1085,17 +1571,33 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   padding: 13px 26px;
   border-radius: 8px;
   transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn__icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+.btn:hover .btn__icon {
+  transform: translateX(2px) scale(1.1);
 }
 .btn--primary {
   background: var(--signal);
   color: var(--void);
 }
-.btn--primary:hover { box-shadow: 0 6px 24px -4px rgba(31,232,184,0.55); transform: translateY(-1px); }
+.btn--primary:hover {
+  box-shadow: 0 6px 24px -4px rgba(31,232,184,0.55);
+  transform: translateY(-1px);
+}
 .btn--ghost {
   border: 1px solid rgba(31,232,184,0.3);
   color: var(--text-primary);
 }
-.btn--ghost:hover { border-color: var(--phosphor); background: rgba(31,232,184,0.06); }
+.btn--ghost:hover {
+  border-color: var(--phosphor);
+  background: rgba(31,232,184,0.06);
+}
 .btn--lg { padding: 15px 30px; font-size: 15.5px; }
 
 .hero__scrollCue {
@@ -1110,7 +1612,26 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   letter-spacing: 0.06em;
   padding: 20px 6% 28px;
 }
-.hero__scrollCue span { width: 26px; height: 1px; background: var(--text-muted); }
+.hero__scrollLine {
+  width: 26px;
+  height: 1px;
+  background: var(--text-muted);
+  position: relative;
+}
+.hero__scrollDot {
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  background: var(--signal);
+  border-radius: 50%;
+  animation: scrollDot 2s ease-in-out infinite;
+}
+@keyframes scrollDot {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(20px); opacity: 0.3; }
+}
 
 /* ---------- Hero transition strip ---------- */
 .heroStrip {
@@ -1136,11 +1657,26 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   letter-spacing: 0.1em;
   color: var(--phosphor);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.heroStrip__num {
+  font-size: 10px;
+  color: var(--text-muted);
 }
 .heroStrip__divider {
   width: 44px;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(31,232,184,0.6), transparent);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heroStrip__divider-dot {
+  font-size: 4px;
+  color: var(--signal);
 }
 
 /* ---------- Secondary hero image ---------- */
@@ -1162,9 +1698,45 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background-position: center;
   background-repeat: no-repeat;
 }
+.heroSecondary__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--void) 0%, transparent 30%, transparent 70%, var(--void) 100%);
+  z-index: 1;
+}
+.heroSecondary__scanline {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(31,232,184,0.02) 50%,
+    transparent 100%
+  );
+  background-size: 100% 4px;
+  animation: scanline 8s linear infinite;
+  z-index: 2;
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+.heroSecondary__data-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0.6;
+}
 .heroSecondary__content {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   max-width: 560px;
   padding: 0 6%;
   text-shadow: 0 2px 18px rgba(0,0,0,0.6);
@@ -1182,12 +1754,6 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   color: var(--text-secondary);
   max-width: 420px;
   margin: 0;
-}
-@media (max-width: 700px) {
-  .heroStrip__inner { min-height: 84px; gap: 14px; }
-  .heroStrip__divider { display: none; }
-  .heroSecondary { height: 52vh; min-height: 360px; }
-  .heroSecondary__content { max-width: 100%; }
 }
 
 /* ---------- Sections ---------- */
@@ -1209,15 +1775,33 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 @media (min-width: 640px) { .grid--4 { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1024px) { .grid--4 { grid-template-columns: repeat(4, 1fr); } }
 
-/* ---------- Readout bar (Why AI Matters / Outcomes) ---------- */
+/* ---------- AI Dashboard ---------- */
+.ai-dashboard {
+  border: 1px solid rgba(31,232,184,0.12);
+  border-radius: var(--radius);
+  padding: 24px;
+  background: var(--panel);
+}
+.ai-dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(31,232,184,0.08);
+}
+.ai-dashboard__status {
+  color: var(--signal);
+}
+
+/* ---------- Readout bar ---------- */
 .readoutBar {
   display: flex;
   align-items: stretch;
   gap: 28px;
   flex-wrap: wrap;
-  border-top: 1px solid rgba(31,232,184,0.14);
-  border-bottom: 1px solid rgba(31,232,184,0.14);
-  padding: 36px 0;
 }
 .readoutBar__item { flex: 1; min-width: 180px; }
 .readoutBar__stat {
@@ -1227,10 +1811,39 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   color: var(--signal);
   margin-bottom: 10px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.readoutBar__trend {
+  font-size: 14px;
+  color: var(--phosphor);
+  font-weight: 400;
 }
 .readoutBar--accent .readoutBar__stat { color: var(--phosphor); }
 .readoutBar__label { color: var(--text-secondary); font-size: 14px; max-width: 220px; }
-.readoutBar__rule { width: 1px; background: rgba(31,232,184,0.16); align-self: stretch; }
+.readoutBar__rule {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(31,232,184,0.16), transparent);
+  align-self: stretch;
+}
+.readoutBar__progress {
+  margin-top: 12px;
+  height: 2px;
+  background: rgba(31,232,184,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.readoutBar__progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--signal), var(--phosphor));
+  border-radius: 2px;
+  animation: progressPulse 2s ease-in-out infinite;
+}
+@keyframes progressPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 @media (max-width: 640px) {
   .readoutBar { flex-direction: column; gap: 24px; }
   .readoutBar__rule { display: none; }
@@ -1244,19 +1857,33 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border: 1px solid rgba(31,232,184,0.1);
   border-radius: var(--radius);
   padding: 26px 26px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.dossierCard:hover {
+  border-color: rgba(31,232,184,0.3);
+  transform: translateY(-2px);
 }
 .dossierCard__top { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
 .dossierCard__id {
-  width: 44px; height: 44px; min-width: 44px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: 6px;
   background: linear-gradient(135deg, var(--signal), var(--circuit));
   position: relative;
+  overflow: hidden;
 }
-.dossierCard__id::after {
-  content: "";
-  position: absolute; inset: 6px;
-  border: 1px solid rgba(2,8,8,0.4);
-  border-radius: 3px;
+.dossierCard__id-pulse {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 70%);
+  animation: idPulse 2s ease-in-out infinite;
+}
+@keyframes idPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 .dossierCard__heading { flex: 1; }
 .dossierCard__name { font-family: var(--font-display); font-size: 18px; margin: 0 0 4px; }
@@ -1272,22 +1899,50 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 }
 .dossierCard__bio { color: var(--text-secondary); font-size: 14.5px; margin: 0 0 18px; }
 .dossierCard__scars {
-  list-style: none; margin: 0; padding: 14px 0 0;
+  list-style: none;
+  margin: 0;
+  padding: 14px 0 0;
   border-top: 1px solid rgba(31,232,184,0.08);
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .dossierCard__scars li {
   font-family: var(--font-mono);
   font-size: 12.5px;
   color: var(--text-muted);
-  padding-left: 16px;
+  padding-left: 20px;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.dossierCard__scars li::before {
-  content: "›"; position: absolute; left: 0; color: var(--signal);
+.dossierCard__scar-icon {
+  color: var(--signal);
+  font-size: 8px;
+}
+.dossierCard__neural {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+}
+.dossierCard__neural-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--signal);
+  border-radius: 50%;
+  animation: neuralDot 1.5s ease-in-out infinite;
+}
+.dossierCard__neural-dot:nth-child(2) { animation-delay: 0.3s; }
+.dossierCard__neural-dot:nth-child(3) { animation-delay: 0.6s; }
+@keyframes neuralDot {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
 }
 
-/* ---------- Ledger (problem / opportunity) ---------- */
+/* ---------- Ledger ---------- */
 .ledger {
   display: grid;
   gap: 0;
@@ -1297,8 +1952,28 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 @media (min-width: 768px) { .ledger { grid-template-columns: 1fr 1px 1fr; } }
 .ledger__col { padding: 6px 0; }
 @media (min-width: 768px) { .ledger__col { padding: 6px 36px; } }
-.ledger__spine { background: rgba(31,232,184,0.15); display: none; }
+.ledger__spine {
+  background: linear-gradient(to bottom, transparent, rgba(31,232,184,0.15), transparent);
+  display: none;
+  position: relative;
+}
 @media (min-width: 768px) { .ledger__spine { display: block; } }
+.ledger__spine-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--signal);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spinePulse 2s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--signal);
+}
+@keyframes spinePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
 .ledger__tag {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1307,9 +1982,12 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border: 1px solid rgba(81,113,106,0.4);
   padding: 3px 9px;
   border-radius: 4px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 16px;
 }
+.ledger__tag-icon { font-size: 10px; }
 .ledger__tag--accent { color: var(--signal); border-color: rgba(31,232,184,0.35); }
 .ledger__heading { font-family: var(--font-display); font-size: 19px; margin: 0 0 12px; color: var(--text-secondary); }
 .ledger__heading--accent { color: var(--phosphor); }
@@ -1323,17 +2001,41 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border-radius: var(--radius);
   padding: 26px 22px;
   border: 1px solid rgba(31,232,184,0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.programmeCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(31,232,184,0.3);
+}
+.programmeCard__icon {
+  font-size: 24px;
+  margin-bottom: 12px;
+  display: block;
 }
 .programmeCard__code {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 0.06em;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 16px;
 }
+.programmeCard__code-dot { color: var(--signal); font-size: 6px; }
 .programmeCard__name { font-family: var(--font-display); font-size: 17px; margin: 0 0 8px; }
 .programmeCard__desc { color: var(--text-secondary); font-size: 14px; margin: 0; }
+.programmeCard__glow {
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(31,232,184,0.03), transparent 70%);
+  pointer-events: none;
+}
 
 /* ---------- Audience switcher ---------- */
 .switcher {
@@ -1386,7 +2088,11 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   padding: 2px 7px;
   border-radius: 999px;
   letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+.switcher__tabBadge-dot { font-size: 6px; }
 
 .switcher__panel {
   padding: 32px 30px;
@@ -1400,14 +2106,12 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 .switcher__list li {
   font-size: 14px;
   color: var(--text-secondary);
-  padding-left: 18px;
-  position: relative;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.switcher__list li::before {
-  content: ""; position: absolute; left: 0; top: 7px;
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--signal);
-}
+.switcher__list-icon { color: var(--signal); font-size: 12px; }
 .switcher__cta {
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -1417,13 +2121,21 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border-radius: 8px;
   letter-spacing: 0.02em;
   transition: box-shadow 0.2s, transform 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .switcher__cta:hover { box-shadow: 0 6px 20px -4px rgba(31,232,184,0.5); transform: translateY(-1px); }
+.switcher__cta-icon { font-size: 12px; }
 
 /* ---------- Success pathway ---------- */
 .pathway { display: flex; flex-direction: column; gap: 0; }
 @media (min-width: 900px) { .pathway { flex-direction: row; align-items: flex-start; } }
-.pathway__step { flex: 1; padding: 4px 0; }
+.pathway__step {
+  flex: 1;
+  padding: 4px 0;
+  position: relative;
+}
 .pathway__num {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -1432,12 +2144,42 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   display: inline-block;
   padding: 3px 9px;
   border-radius: 5px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   font-weight: 600;
 }
+.pathway__icon { font-size: 24px; margin-bottom: 8px; display: block; }
 .pathway__title { font-family: var(--font-display); font-size: 18px; margin: 0 0 8px; }
-.pathway__desc { color: var(--text-secondary); font-size: 14px; max-width: 240px; margin: 0; }
-.pathway__connector { width: 1px; height: 30px; background: rgba(31,232,184,0.2); margin: 6px 0 6px 18px; }
+.pathway__desc { color: var(--text-secondary); font-size: 14px; max-width: 240px; margin: 0 0 12px; }
+.pathway__progress {
+  height: 2px;
+  background: rgba(31,232,184,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 80%;
+}
+.pathway__progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--signal), var(--phosphor));
+  border-radius: 2px;
+  transition: width 1s ease;
+}
+.pathway__connector {
+  width: 1px;
+  height: 30px;
+  background: rgba(31,232,184,0.2);
+  margin: 6px 0 6px 18px;
+  position: relative;
+}
+.pathway__connector-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--signal);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
 @media (min-width: 900px) {
   .pathway__connector { width: auto; height: 1px; flex: 0 0 40px; margin: 26px 0 0; background: rgba(31,232,184,0.25); }
 }
@@ -1452,8 +2194,21 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background: var(--panel);
   padding: 18px 22px;
   border-bottom: 1px solid rgba(31,232,184,0.06);
+  transition: background 0.3s ease;
 }
-.workshopRow__date { font-family: var(--font-mono); font-size: 13px; color: var(--phosphor); }
+.workshopRow:hover { background: rgba(31,232,184,0.03); }
+.workshopRow__date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--phosphor);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.workshopRow__date-dot {
+  font-size: 6px;
+  color: var(--signal);
+}
 .workshopRow__title { font-size: 15px; }
 .workshopRow__mode { font-size: 12.5px; color: var(--text-muted); display: none; }
 @media (min-width: 640px) { .workshopRow__mode { display: block; } }
@@ -1465,8 +2220,13 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   border-radius: 999px;
   color: var(--phosphor);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.2s, background 0.2s;
 }
 .workshopRow__cta:hover { border-color: var(--signal); background: rgba(31,232,184,0.08); }
+.workshopRow__cta-icon { font-size: 8px; }
 
 /* ---------- Academy tour ---------- */
 .tourPanel {
@@ -1480,27 +2240,82 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background: radial-gradient(circle at 50% 50%, var(--circuit), var(--void) 75%);
   border: 1px solid rgba(31,232,184,0.1);
 }
+.tourPanel__hologram {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.tourPanel__hologram-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(31,232,184,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31,232,184,0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.tourPanel__hologram-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(31,232,184,0.15), transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: hologramPulse 3s ease-in-out infinite;
+}
+@keyframes hologramPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+}
 .tourPanel__playGlow {
-  position: absolute; width: 240px; height: 240px; border-radius: 50%;
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
   background: radial-gradient(circle, rgba(31,232,184,0.32), transparent 70%);
   filter: blur(4px);
 }
 .tourPanel__playBtn {
   position: relative;
   z-index: 2;
-  width: 76px; height: 76px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   background: rgba(31,232,184,0.12);
   border: 1px solid var(--phosphor);
   color: var(--phosphor);
-  font-size: 22px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s, background 0.2s;
 }
 .tourPanel__playBtn:hover { transform: scale(1.08); background: rgba(31,232,184,0.2); }
+.tourPanel__playIcon { font-size: 22px; }
 .tourPanel__caption {
-  position: absolute; bottom: 22px; left: 0; right: 0; text-align: center;
-  font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); letter-spacing: 0.04em;
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  z-index: 2;
+}
+.tourPanel__data-feed {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  z-index: 2;
 }
 
 /* ---------- CTA ---------- */
@@ -1509,8 +2324,31 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   padding: 110px 6%;
   text-align: center;
   background: radial-gradient(ellipse 70% 60% at 50% 0%, var(--circuit), var(--void) 70%);
+  overflow: hidden;
 }
-.cta__inner { max-width: 700px; margin: 0 auto; }
+.cta__neural-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cta__neural-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--signal);
+  border-radius: 50%;
+  animation: neuralParticle 8s ease-in-out infinite;
+  opacity: 0.3;
+}
+.cta__neural-particle:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+.cta__neural-particle:nth-child(2) { top: 60%; left: 70%; animation-delay: 2s; }
+.cta__neural-particle:nth-child(3) { top: 80%; left: 30%; animation-delay: 4s; }
+@keyframes neuralParticle {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  50% { transform: translate(50px, -30px) scale(3); opacity: 0.8; }
+}
+.cta__inner { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
 .cta__title {
   font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 42px);
@@ -1520,25 +2358,99 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
 }
 .cta__sub { color: var(--text-secondary); font-size: 16px; margin-bottom: 36px; }
 .cta__row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.cta__eyebrow-icon { font-size: 12px; }
+.cta__ai-status {
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cta__ai-dot {
+  color: var(--signal);
+  animation: pulseDot 2s ease-in-out infinite;
+}
 
 /* ---------- Footer ---------- */
-.footer { padding: 56px 6% 40px; border-top: 1px solid rgba(31,232,184,0.08); }
+.footer {
+  padding: 56px 6% 40px;
+  border-top: 1px solid rgba(31,232,184,0.08);
+  position: relative;
+}
+.footer__neural-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--signal), transparent);
+  opacity: 0.3;
+}
 .footer__inner { max-width: var(--maxw); margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
 .footer__brand { display: flex; align-items: baseline; gap: 8px; }
+.footer__brand-ai {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--signal);
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
 .footer__tag { color: var(--text-muted); font-size: 13.5px; max-width: 360px; }
 .footer__links { display: flex; gap: 26px; font-size: 13.5px; color: var(--text-secondary); flex-wrap: wrap; }
+.footer__links a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.3s ease;
+}
 .footer__links a:hover { color: var(--phosphor); }
+.footer__link-icon { font-size: 8px; }
+.footer__ai-metrics {
+  display: flex;
+  gap: 24px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  padding-top: 16px;
+  border-top: 1px solid rgba(31,232,184,0.06);
+}
 
 /* ---------- Personalization Gate ---------- */
 .gate {
-  position: fixed; inset: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
 }
 .gate__backdrop {
-  position: absolute; inset: 0;
-  background: rgba(4,9,10,0.88);
-  backdrop-filter: blur(6px);
+  position: absolute;
+  inset: 0;
+  background: rgba(4,9,10,0.92);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+.gate__scanline {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(31,232,184,0.1), transparent);
+  animation: scanline 0.05s linear infinite;
+}
+.gate__grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(31,232,184,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31,232,184,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 .gate__panel {
   position: relative;
@@ -1548,27 +2460,59 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background: var(--panel);
   border: 1px solid rgba(31,232,184,0.15);
   border-radius: 16px;
-  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(31,232,184,0.06);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(31,232,184,0.06), 0 0 40px rgba(31,232,184,0.03);
   overflow: hidden;
   animation: gateIn 0.35s ease;
 }
 @keyframes gateIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
 .gate__panelHeader {
-  display: flex; align-items: center; gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 20px;
   background: var(--void);
   border-bottom: 1px solid rgba(31,232,184,0.08);
 }
-.gate__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--signal); }
-.gate__headerText { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); flex: 1; }
+.gate__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal);
+}
+.gate__headerText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  flex: 1;
+}
 .gate__headerId { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); opacity: 0.6; }
 .gate__body { padding: 36px 32px 30px; }
-.gate__kicker { font-family: var(--font-mono); font-size: 12px; color: var(--phosphor); letter-spacing: 0.05em; margin: 0 0 10px; }
-.gate__title { font-family: var(--font-display); font-size: 26px; margin: 0 0 12px; }
+.gate__kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--phosphor);
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gate__kicker-dot {
+  color: var(--signal);
+  font-size: 8px;
+}
+.gate__title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  margin: 0 0 12px;
+}
 .gate__copy { color: var(--text-secondary); font-size: 14.5px; margin: 0 0 26px; max-width: 440px; }
 .gate__options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
 .gate__option {
-  display: flex; align-items: center; gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   text-align: left;
   padding: 16px 18px;
@@ -1582,9 +2526,24 @@ header, nav, h1, h2, h3, p { margin: 0; padding: 0; }
   background: rgba(31,232,184,0.08);
   transform: translateX(2px);
 }
+.gate__optionMarker {
+  font-size: 12px;
+  color: var(--signal);
+  width: 16px;
+}
 .gate__optionLabel { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; flex: 0 0 150px; }
 .gate__optionSub { font-size: 13px; color: var(--text-muted); flex: 1; }
 .gate__optionArrow { color: var(--phosphor); font-size: 16px; }
-.gate__skip { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; }
+.gate__skip {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
 .gate__skip:hover { color: var(--phosphor); }
+.gate__skip-icon { font-size: 14px; }
 `;
