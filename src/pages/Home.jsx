@@ -413,45 +413,7 @@ function SignalRail() {
 /* ------------------------------------------------------------
    Navbar + Hero with AI animations
 ------------------------------------------------------------ */
-function Navbar({ onReset }) {
-  const [hovered, setHovered] = useState(false);
 
-  return (
-    <nav className="navbar">
-      <div className="hero__logo" onClick={onReset} role="button" tabIndex={0}>
-        <span className="hero__logoMark">EX</span>
-        <span className="hero__logoWord">ELEVOX</span>
-        <span className="hero__logoPulse" />
-      </div>
-      <div className="hero__navLinks">
-        <a href="#why-ai" className="nav-link">
-          <span className="nav-link__indicator" />
-          Programmes
-        </a>
-        <a href="#founders" className="nav-link">
-          <span className="nav-link__indicator" />
-          Founders
-        </a>
-        <a href="#pathway" className="nav-link">
-          <span className="nav-link__indicator" />
-          Outcomes
-        </a>
-        <a href="#workshops" className="nav-link">
-          <span className="nav-link__indicator" />
-          Workshops
-        </a>
-      </div>
-      <button 
-        className="hero__navCta"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <span className="hero__navCta-text">Talk to us</span>
-        {hovered && <span className="hero__navCta-wave">~~~</span>}
-      </button>
-    </nav>
-  );
-}
 
 function Hero({ pathway }) {
   const path = useMemo(
@@ -958,34 +920,6 @@ function UpcomingWorkshops() {
 /* ------------------------------------------------------------
    9. Academy Tour Preview — AI hologram
 ------------------------------------------------------------ */
-function AcademyTourPreview() {
-  return (
-    <SectionShell
-      id="tour"
-      index={9}
-      eyebrow="Inside Elevox"
-      title="A campus built to feel like a tech company, not a coaching centre."
-      sub="Take a 90-second walk through the studios, mentor pods, and capstone labs before you visit in person."
-    >
-      <div className="tourPanel">
-        <div className="tourPanel__hologram">
-          <div className="tourPanel__hologram-grid" />
-          <div className="tourPanel__hologram-pulse" />
-        </div>
-        <div className="tourPanel__playGlow" />
-        <button className="tourPanel__playBtn" aria-label="Play academy tour video">
-          <span className="tourPanel__playIcon">▶</span>
-        </button>
-        <span className="tourPanel__caption">90-second academy walkthrough</span>
-        <div className="tourPanel__data-feed">
-          <span className="tourPanel__data-item">[STUDIO_1: ACTIVE]</span>
-          <span className="tourPanel__data-item">[CAPSTONE_LAB: READY]</span>
-          <span className="tourPanel__data-item">[MENTOR_POD: 4/6 CONNECTED]</span>
-        </div>
-      </div>
-    </SectionShell>
-  );
-}
 
 /* ------------------------------------------------------------
    10. Call To Action — AI recruitment
@@ -1026,47 +960,7 @@ function CallToAction() {
   );
 }
 
-/* ------------------------------------------------------------
-   Footer with AI branding
------------------------------------------------------------- */
-function Footer() {
-  return (
-    <footer className="footer">
-      <div className="footer__neural-line" />
-      <div className="footer__inner">
-        <div className="footer__brand">
-          <span className="hero__logoMark">EX</span>
-          <span className="hero__logoWord">ELEVOX</span>
-          <span className="footer__brand-ai">[AI_POWERED]</span>
-        </div>
-        <p className="footer__tag">The bridge between learning AI and being employable because of it.</p>
-        <div className="footer__links">
-          <a href="#programmes">
-            <span className="footer__link-icon">▸</span>
-            Programmes
-          </a>
-          <a href="#founders">
-            <span className="footer__link-icon">▸</span>
-            Founders
-          </a>
-          <a href="#pathway">
-            <span className="footer__link-icon">▸</span>
-            Outcomes
-          </a>
-          <a href="#workshops">
-            <span className="footer__link-icon">▸</span>
-            Workshops
-          </a>
-        </div>
-        <div className="footer__ai-metrics">
-          <span>AI_READY: 100%</span>
-          <span>OPTIMIZATION: ACTIVE</span>
-          <span>CONNECTION: SECURE</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
+
 
 /* ------------------------------------------------------------
    MAIN — Home
@@ -1092,7 +986,6 @@ export default function Home() {
 
       <NeuralBackground />
       <SignalRail />
-      <Navbar onReset={handleReset} />
       <Hero pathway={pathway} />
       <HeroTransitionStrip />
       <SecondaryHeroImage />
@@ -1105,9 +998,8 @@ export default function Home() {
       <SuccessPathway />
       <PlacementOutcomes />
       <UpcomingWorkshops />
-      <AcademyTourPreview />
+      {/* <AcademyTourPreview /> */}
       <CallToAction />
-      <Footer />
     </div>
   );
 }

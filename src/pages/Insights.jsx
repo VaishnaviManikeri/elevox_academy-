@@ -1,141 +1,36 @@
-// pages/Insights.jsx
-const Insights = () => {
-  const articles = [
-    {
-      title: "The AI Skills Gap: Why Tier-2 Cities Are the Next Frontier",
-      category: "Trends",
-      readTime: "8 min read",
-      excerpt: "As AI talent becomes more valuable, Tier-2 cities are emerging as untapped sources of potential.",
-    },
-    {
-      title: "Building AI Systems That Actually Work",
-      category: "Founder Articles",
-      readTime: "12 min read",
-      excerpt: "Lessons from building production AI systems at scale, and why most projects fail.",
-    },
-    {
-      title: "From Classroom to Career: Student Success Stories",
-      category: "Student Stories",
-      readTime: "6 min read",
-      excerpt: "How Elevox graduates are transforming their careers and making an impact in AI.",
-    },
-    {
-      title: "AI Implementation in Manufacturing: A Case Study",
-      category: "Case Studies",
-      readTime: "10 min read",
-      excerpt: "Real-world results from implementing AI in a manufacturing environment.",
-    },
-  ];
+import BlueprintPage from "../components/BlueprintPage";
 
+export default function Insights() {
   return (
-    <div style={containerStyles}>
-      <section style={sectionStyles}>
-        <h1 style={pageTitleStyles}>Insights</h1>
-        <p style={pageSubtitleStyles}>
-          Thought leadership, trends, and stories from the world of AI.
-        </p>
-      </section>
-
-      <section style={gridStyles}>
-        {articles.map((article, i) => (
-          <div key={i} style={cardStyles}>
-            <span style={categoryStyles}>{article.category}</span>
-            <h3 style={titleStyles}>{article.title}</h3>
-            <p style={excerptStyles}>{article.excerpt}</p>
-            <div style={footerStyles}>
-              <span style={readTimeStyles}>{article.readTime}</span>
-              <a href="#" style={readMoreStyles}>Read More →</a>
-            </div>
-          </div>
-        ))}
-      </section>
-    </div>
+    <BlueprintPage
+      eyebrow="Insights and knowledge hub"
+      title="A thought leadership hub for founders, trends, reports, stories, and case studies."
+      summary="The insights section positions Elevox founders as credible voices in applied AI, employability, and business transformation."
+      primaryCta={["Read founder articles", "/insights/articles"]}
+      secondaryCta={["Meet founders", "/founders"]}
+      proof={["AI trends", "Founder articles", "Case studies"]}
+      sections={[
+        {
+          eyebrow: "Content categories",
+          title: "Build authority before selling programmes.",
+          copy: "The hub should educate prospects and help search engines understand Elevox as an applied AI authority.",
+          items: [
+            { icon: "chart", label: "Trends", title: "AI Trends", copy: "Market shifts, tools, job changes, and AI adoption patterns." },
+            { icon: "book", label: "Reports", title: "Industry Reports", copy: "Deeper explainers around sectors, skills, and workforce transformation." },
+            { icon: "users", label: "Founders", title: "Founder Articles", copy: "Operator perspectives that build credibility and trust." },
+            { icon: "graduation", label: "Students", title: "Student Success Stories", copy: "Learner journeys from programme to portfolio and career confidence." },
+            { icon: "briefcase", label: "Business", title: "Case Studies", copy: "Examples of transformation, training, and applied AI outcomes." },
+            { icon: "play", label: "Media", title: "Webinars and podcasts", copy: "Recordings, conversations, and expert sessions for ongoing learning." },
+          ],
+        },
+      ]}
+      finalCta={{
+        eyebrow: "Content CTA",
+        title: "Use insight to build trust before the first counselling call.",
+        copy: "The knowledge hub can grow into one of Elevox's strongest authority channels.",
+        label: "Explore programmes",
+        to: "/programmes",
+      }}
+    />
   );
-};
-
-const containerStyles = {
-  minHeight: "100vh",
-  backgroundColor: "#08090d",
-  paddingTop: "72px",
-};
-
-const sectionStyles = {
-  padding: "60px 24px 40px",
-  maxWidth: "900px",
-  margin: "0 auto",
-  textAlign: "center",
-};
-
-const pageTitleStyles = {
-  fontFamily: "'Space Grotesk', sans-serif",
-  fontSize: "clamp(2rem, 5vw, 3.5rem)",
-  fontWeight: 700,
-  color: "#f0f2f5",
-  marginBottom: "16px",
-};
-
-const pageSubtitleStyles = {
-  fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
-  color: "rgba(240,242,245,0.6)",
-};
-
-const gridStyles = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-  gap: "32px",
-  maxWidth: "1024px",
-  margin: "0 auto",
-  padding: "0 24px 80px",
-};
-
-const cardStyles = {
-  backgroundColor: "rgba(255,255,255,0.03)",
-  borderRadius: "16px",
-  padding: "28px",
-  border: "1px solid rgba(255,255,255,0.06)",
-};
-
-const categoryStyles = {
-  fontSize: "11px",
-  fontWeight: 600,
-  letterSpacing: "1px",
-  textTransform: "uppercase",
-  color: "#00d4a8",
-  marginBottom: "12px",
-  display: "block",
-};
-
-const titleStyles = {
-  fontSize: "18px",
-  fontWeight: 600,
-  color: "#f0f2f5",
-  marginBottom: "12px",
-  lineHeight: "1.3",
-};
-
-const excerptStyles = {
-  fontSize: "14px",
-  color: "rgba(240,242,245,0.6)",
-  lineHeight: "1.6",
-  marginBottom: "16px",
-};
-
-const footerStyles = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-const readTimeStyles = {
-  fontSize: "13px",
-  color: "rgba(240,242,245,0.3)",
-};
-
-const readMoreStyles = {
-  color: "#00d4a8",
-  textDecoration: "none",
-  fontSize: "13px",
-  fontWeight: 500,
-};
-
-export default Insights;
+}

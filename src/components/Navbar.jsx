@@ -170,7 +170,9 @@ function Logo() {
     <Link to="/" className="elx-logo" aria-label="Elevox AI Academy home">
       <span className="elx-logo-mark">E</span>
       <span className="elx-logo-copy">
-        <strong>Elev<span>ox</span></strong>
+        <strong>
+          Elev<span>ox</span>
+        </strong>
         <small>AI Academy</small>
       </span>
     </Link>
@@ -181,7 +183,7 @@ function MegaMenu({ item, open, onNavigate }) {
   if (!item.groups) return null;
 
   return (
-    <div className={`elx-mega ${open ? "is-open" : ""}`}>
+    <div className={`elx-mega ${open ? "is-open" : ""}`} role="region" aria-label={`${item.label} menu`}>
       <div className={`elx-mega-inner ${item.compact ? "is-compact" : ""}`}>
         <div className="elx-mega-groups">
           {item.groups.map((group) => (
@@ -202,7 +204,9 @@ function MegaMenu({ item, open, onNavigate }) {
             <span>Featured</span>
             <strong>{item.featured[0]}</strong>
             <small>{item.featured[1]}</small>
-            <em>Explore -&gt;</em>
+            <em>
+              Explore <i aria-hidden="true">&rarr;</i>
+            </em>
           </Link>
         )}
       </div>
@@ -230,6 +234,17 @@ export default function Navbar() {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setActive(null);
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   const closeAll = () => {
     setActive(null);
     setMobileOpen(false);
@@ -247,7 +262,7 @@ export default function Navbar() {
   return (
     <>
       <style>{styles}</style>
-      <header className={`elx-nav ${scrolled ? "is-scrolled" : ""}`}>
+      <header className={`elx-nav ${scrolled ? "is-scrolled" : ""} ${active !== null ? "has-open-menu" : ""}`}>
         <div className="elx-nav-inner">
           <Logo />
 
@@ -269,7 +284,7 @@ export default function Navbar() {
                       aria-expanded={active === index}
                     >
                       {item.label}
-                      <span aria-hidden="true">v</span>
+                      <i aria-hidden="true" className="elx-caret" />
                     </button>
                   ) : (
                     <Link to={item.to} className="elx-nav-link" onClick={closeAll}>
@@ -282,8 +297,12 @@ export default function Navbar() {
           </nav>
 
           <div className="elx-nav-actions">
-            <Link to="/workshops" className="elx-btn elx-btn-ghost">Workshop</Link>
-            <Link to="/admissions" className="elx-btn elx-btn-primary">Apply Now</Link>
+            <Link to="/workshops" className="elx-btn elx-btn-ghost">
+              Workshop
+            </Link>
+            <Link to="/admissions" className="elx-btn elx-btn-primary">
+              Apply Now
+            </Link>
             <button
               className="elx-menu-btn"
               type="button"
@@ -297,24 +316,28 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </header>
 
-      {navItems.map((item, index) => (
         <div
-          key={item.label}
-          onMouseEnter={() => show(index)}
+          className="elx-mega-stack"
+          onMouseEnter={() => active !== null && show(active)}
           onMouseLeave={hideSoon}
         >
-          <MegaMenu item={item} open={active === index} onNavigate={closeAll} />
+          {navItems.map((item, index) => (
+            <MegaMenu key={item.label} item={item} open={active === index} onNavigate={closeAll} />
+          ))}
         </div>
-      ))}
+      </header>
+
+      <div className={`elx-mobile-backdrop ${mobileOpen ? "is-open" : ""}`} onClick={closeAll} />
 
       <div className={`elx-mobile-panel ${mobileOpen ? "is-open" : ""}`}>
         {navItems.map((item) => (
           <details className="elx-mobile-section" key={item.label}>
             <summary>
-              <Link to={item.to} onClick={closeAll}>{item.label}</Link>
-              {item.groups && <span>+</span>}
+              <Link to={item.to} onClick={closeAll}>
+                {item.label}
+              </Link>
+              {item.groups && <span aria-hidden="true">+</span>}
             </summary>
             {item.groups?.map((group) => (
               <div className="elx-mobile-group" key={group.title}>
@@ -330,8 +353,12 @@ export default function Navbar() {
           </details>
         ))}
         <div className="elx-mobile-actions">
-          <Link to="/workshops" onClick={closeAll}>Book Workshop</Link>
-          <Link to="/admissions" onClick={closeAll}>Apply Now</Link>
+          <Link to="/workshops" onClick={closeAll}>
+            Book Workshop
+          </Link>
+          <Link to="/admissions" onClick={closeAll}>
+            Apply Now
+          </Link>
         </div>
       </div>
     </>
@@ -342,67 +369,74 @@ const styles = `
   .elx-nav {
     position: fixed;
     inset: 0 0 auto;
-    height: 72px;
+    height: 76px;
     z-index: 1000;
-    background: rgba(8, 9, 13, 0.76);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px) saturate(1.35);
-    font-family: Inter, system-ui, sans-serif;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease, backdrop-filter 0.3s ease;
+    font-family: "Inter", system-ui, sans-serif;
   }
 
-  .elx-nav.is-scrolled {
-    background: rgba(8, 9, 13, 0.94);
-    border-bottom-color: rgba(0, 212, 168, 0.18);
+  .elx-nav.is-scrolled,
+  .elx-nav.has-open-menu {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 
   .elx-nav-inner {
+    position: relative;
     height: 100%;
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 28px;
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 36px;
+    z-index: 2;
   }
 
   .elx-logo {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
     text-decoration: none;
-    color: #f0f2f5;
+    color: #f5f6f8;
     flex: 0 0 auto;
   }
 
   .elx-logo-mark {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     display: grid;
     place-items: center;
-    border-radius: 8px;
+    border-radius: 9px;
     color: #00d4a8;
     background: rgba(0, 212, 168, 0.1);
-    border: 1px solid rgba(0, 212, 168, 0.28);
+    border: 1px solid rgba(0, 212, 168, 0.3);
     font-family: "Space Grotesk", Inter, sans-serif;
     font-weight: 800;
-    box-shadow: 0 0 32px rgba(0, 212, 168, 0.08);
+    font-size: 18px;
   }
 
   .elx-logo-copy strong {
     display: block;
     font-family: "Space Grotesk", Inter, sans-serif;
-    font-size: 22px;
+    font-weight: 600;
+    font-size: 21px;
     line-height: 1;
+    letter-spacing: -0.01em;
   }
 
-  .elx-logo-copy strong span { color: #00d4a8; }
+  .elx-logo-copy strong span {
+    color: #00d4a8;
+  }
 
   .elx-logo-copy small {
     display: block;
     margin-top: 4px;
-    color: rgba(240, 242, 245, 0.46);
+    color: rgba(245, 246, 248, 0.5);
     font-size: 9px;
-    letter-spacing: 0.22em;
+    font-weight: 600;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
   }
 
@@ -414,29 +448,39 @@ const styles = `
   }
 
   .elx-nav-link {
-    min-height: 38px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     border: 0;
     border-radius: 8px;
-    padding: 0 13px;
-    color: rgba(240, 242, 245, 0.62);
+    padding: 0 14px;
+    color: rgba(245, 246, 248, 0.74);
     background: transparent;
     text-decoration: none;
-    font: 600 14px Inter, system-ui, sans-serif;
+    font: 500 14.5px Inter, system-ui, sans-serif;
     cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
   }
 
   .elx-nav-link:hover,
   .elx-nav-link.is-active {
-    color: #f0f2f5;
-    background: rgba(255, 255, 255, 0.045);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
   }
 
-  .elx-nav-link span {
-    font-size: 11px;
-    color: #00d4a8;
+  .elx-caret {
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    opacity: 0.65;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.18s ease;
+  }
+
+  .elx-nav-link.is-active .elx-caret {
+    transform: translateY(0) rotate(225deg);
   }
 
   .elx-nav-actions {
@@ -446,37 +490,53 @@ const styles = `
   }
 
   .elx-btn {
-    min-height: 38px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     border-radius: 8px;
-    padding: 0 18px;
+    padding: 0 20px;
     text-decoration: none;
-    font: 700 14px Inter, system-ui, sans-serif;
+    font: 600 14px Inter, system-ui, sans-serif;
+    transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }
 
   .elx-btn-ghost {
-    color: rgba(240, 242, 245, 0.7);
+    color: rgba(245, 246, 248, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .elx-btn-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   .elx-btn-primary {
-    color: #031a14;
+    color: #04201a;
     background: #00d4a8;
   }
 
-  .elx-mega {
-    position: fixed;
-    top: 72px;
+  .elx-btn-primary:hover {
+    opacity: 0.88;
+  }
+
+  .elx-mega-stack {
+    position: absolute;
+    top: 100%;
     left: 0;
     right: 0;
-    z-index: 999;
+  }
+
+  .elx-mega {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-10px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-    background: rgba(10, 11, 16, 0.97);
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    background: rgba(8, 9, 13, 0.92);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(24px);
+    backdrop-filter: blur(22px) saturate(1.3);
   }
 
   .elx-mega.is-open {
@@ -486,23 +546,23 @@ const styles = `
   }
 
   .elx-mega-inner {
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 30px 24px 34px;
+    padding: 32px 28px 36px;
     display: grid;
     grid-template-columns: 1fr 280px;
-    gap: 34px;
+    gap: 36px;
   }
 
   .elx-mega-inner.is-compact {
-    max-width: 760px;
+    max-width: 780px;
     grid-template-columns: 1fr;
   }
 
   .elx-mega-groups {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px;
+    gap: 30px;
   }
 
   .elx-mega-inner.is-compact .elx-mega-groups {
@@ -514,7 +574,8 @@ const styles = `
     margin: 0 0 12px;
     color: #00d4a8;
     font-size: 11px;
-    letter-spacing: 0.16em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
@@ -523,24 +584,26 @@ const styles = `
     flex-direction: column;
     gap: 3px;
     border-radius: 8px;
-    padding: 10px;
-    color: rgba(240, 242, 245, 0.78);
+    padding: 10px 11px;
+    color: rgba(245, 246, 248, 0.82);
     text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
   }
 
   .elx-mega-link:hover {
-    background: rgba(0, 212, 168, 0.06);
-    color: #f0f2f5;
+    background: rgba(0, 212, 168, 0.07);
+    color: #ffffff;
   }
 
   .elx-mega-link span {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 14.5px;
+    font-weight: 600;
   }
 
   .elx-mega-link small {
-    color: rgba(240, 242, 245, 0.36);
-    line-height: 1.35;
+    color: rgba(245, 246, 248, 0.4);
+    line-height: 1.4;
+    font-size: 12.5px;
   }
 
   .elx-mega-feature {
@@ -548,63 +611,94 @@ const styles = `
     flex-direction: column;
     justify-content: center;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
-    padding-left: 30px;
+    padding-left: 32px;
     text-decoration: none;
   }
 
   .elx-mega-feature span {
     color: #00d4a8;
     font-size: 11px;
-    letter-spacing: 0.16em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .elx-mega-feature strong {
     margin: 12px 0 10px;
-    color: #f0f2f5;
+    color: #ffffff;
     font-family: "Space Grotesk", Inter, sans-serif;
-    font-size: 20px;
-    line-height: 1.2;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 1.25;
   }
 
   .elx-mega-feature small {
-    color: rgba(240, 242, 245, 0.5);
+    color: rgba(245, 246, 248, 0.5);
     line-height: 1.55;
+    font-size: 13.5px;
   }
 
   .elx-mega-feature em {
     margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: #00d4a8;
     font-style: normal;
-    font-weight: 800;
+    font-weight: 700;
+    font-size: 13.5px;
+    transition: gap 0.15s ease;
+  }
+
+  .elx-mega-feature:hover em {
+    gap: 9px;
   }
 
   .elx-menu-btn {
     display: none;
     width: 42px;
     height: 42px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 10px;
     background: transparent;
     padding: 10px;
+    flex: 0 0 auto;
   }
 
   .elx-menu-btn span {
     display: block;
     height: 2px;
     margin: 4px 0;
-    background: #f0f2f5;
+    background: #f5f6f8;
+    border-radius: 1px;
+  }
+
+  .elx-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 997;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .elx-mobile-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .elx-mobile-panel {
     position: fixed;
-    inset: 72px 0 0;
+    inset: 0 0 0 auto;
+    width: min(86vw, 400px);
     z-index: 998;
-    padding: 16px 20px 36px;
+    padding: 96px 22px 36px;
     overflow: auto;
     transform: translateX(100%);
-    transition: transform 0.28s ease;
-    background: rgba(8, 9, 13, 0.985);
+    transition: transform 0.3s ease;
+    background: rgba(9, 10, 14, 0.98);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
   }
 
@@ -614,7 +708,7 @@ const styles = `
 
   .elx-mobile-section {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 8px 0;
+    padding: 6px 0;
   }
 
   .elx-mobile-section summary {
@@ -622,21 +716,30 @@ const styles = `
     align-items: center;
     justify-content: space-between;
     list-style: none;
-    color: #f0f2f5;
-    font-weight: 800;
+    color: #f5f6f8;
+    font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
   }
 
-  .elx-mobile-section summary::-webkit-details-marker { display: none; }
+  .elx-mobile-section summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .elx-mobile-section summary span {
+    color: rgba(245, 246, 248, 0.4);
+    font-weight: 400;
+  }
 
   .elx-mobile-section summary a {
     color: inherit;
     text-decoration: none;
-    padding: 12px 0;
+    padding: 14px 0;
+    flex: 1;
   }
 
   .elx-mobile-group {
-    padding: 8px 0 14px;
+    padding: 6px 0 16px;
   }
 
   .elx-mobile-group a {
@@ -645,34 +748,56 @@ const styles = `
     gap: 2px;
     padding: 9px 10px;
     border-radius: 8px;
-    color: rgba(240, 242, 245, 0.76);
+    color: rgba(245, 246, 248, 0.78);
     text-decoration: none;
   }
 
   .elx-mobile-group small {
-    color: rgba(240, 242, 245, 0.4);
+    color: rgba(245, 246, 248, 0.4);
+    font-size: 12.5px;
   }
 
   .elx-mobile-actions {
     display: grid;
     gap: 10px;
-    padding-top: 18px;
+    padding-top: 22px;
   }
 
   .elx-mobile-actions a {
-    padding: 13px 16px;
+    padding: 14px 16px;
     border-radius: 10px;
     text-align: center;
     text-decoration: none;
-    color: #031a14;
+    font-weight: 700;
+    font-size: 14.5px;
+    color: #04201a;
     background: #00d4a8;
-    font-weight: 800;
   }
 
   .elx-mobile-actions a:first-child {
-    color: #f0f2f5;
+    color: #f5f6f8;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .elx-nav-link:focus-visible,
+  .elx-btn:focus-visible,
+  .elx-menu-btn:focus-visible,
+  .elx-mega-link:focus-visible,
+  .elx-mega-feature:focus-visible {
+    outline: 2px solid #00d4a8;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .elx-nav,
+    .elx-mega,
+    .elx-mobile-panel,
+    .elx-mobile-backdrop,
+    .elx-caret,
+    .elx-mega-feature em {
+      transition: none !important;
+    }
   }
 
   @media (max-width: 1120px) {
@@ -689,17 +814,30 @@ const styles = `
       display: block;
     }
 
-    .elx-mega {
+    .elx-mega-stack {
       display: none;
     }
   }
 
   @media (max-width: 520px) {
-    .elx-nav { height: 64px; }
-    .elx-mobile-panel { inset-top: 64px; }
-    .elx-nav-inner { padding: 0 16px; }
-    .elx-logo-mark { width: 36px; height: 36px; }
-    .elx-logo-copy strong { font-size: 19px; }
-    .elx-logo-copy small { display: none; }
+    .elx-nav {
+      height: 64px;
+    }
+    .elx-mobile-panel {
+      padding-top: 84px;
+    }
+    .elx-nav-inner {
+      padding: 0 16px;
+    }
+    .elx-logo-mark {
+      width: 36px;
+      height: 36px;
+    }
+    .elx-logo-copy strong {
+      font-size: 19px;
+    }
+    .elx-logo-copy small {
+      display: none;
+    }
   }
 `;

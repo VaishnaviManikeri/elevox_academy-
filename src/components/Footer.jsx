@@ -1,7 +1,19 @@
 // components/Footer.jsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleLinkClick = (path) => {
+    // Scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+    // Navigate to the path
+    navigate(path);
+  };
+
   return (
     <footer style={footerStyles}>
       <div style={containerStyles}>
@@ -21,31 +33,101 @@ const Footer = () => {
           </div>
           <div style={colStyles}>
             <h4 style={subHeadingStyles}>Programmes</h4>
-            <Link to="/programmes/foundations" style={linkStyles}>Foundations</Link>
-            <Link to="/programmes/marketing" style={linkStyles}>AI for Marketing</Link>
-            <Link to="/programmes/hr" style={linkStyles}>AI for HR</Link>
-            <Link to="/programmes/upskilling" style={linkStyles}>Professional Upskilling</Link>
+            <span 
+              onClick={() => handleLinkClick("/programmes/foundations")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Foundations
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/programmes/marketing")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              AI for Marketing
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/programmes/hr")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              AI for HR
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/programmes/upskilling")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Professional Upskilling
+            </span>
           </div>
           <div style={colStyles}>
             <h4 style={subHeadingStyles}>Company</h4>
-            <Link to="/aboutus" style={linkStyles}>About Us</Link>
-            <Link to="/leadership" style={linkStyles}>Leadership</Link>
-            <Link to="/contact" style={linkStyles}>Contact</Link>
-            <Link to="/career" style={linkStyles}>Careers</Link>
+            <span 
+              onClick={() => handleLinkClick("/aboutus")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              About Us
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/leadership")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Leadership
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/contact")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Contact
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/career")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Careers
+            </span>
           </div>
           <div style={colStyles}>
             <h4 style={subHeadingStyles}>Support</h4>
-            <Link to="/admissions" style={linkStyles}>Admissions</Link>
-            <Link to="/workshops" style={linkStyles}>Workshops</Link>
-            <Link to="/insights" style={linkStyles}>Insights</Link>
-            <Link to="/tour" style={linkStyles}>Academy Tour</Link>
+            <span 
+              onClick={() => handleLinkClick("/admissions")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Admissions
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/workshops")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Workshops
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/insights")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Insights
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/tour")} 
+              style={{...linkStyles, cursor: "pointer"}}
+            >
+              Academy Tour
+            </span>
           </div>
         </div>
         <div style={bottomStyles}>
           <p style={copyStyles}>© 2026 Elevox AI Academy. All rights reserved.</p>
           <div style={legalStyles}>
-            <Link to="/privacy" style={legalLinkStyles}>Privacy Policy</Link>
-            <Link to="/terms" style={legalLinkStyles}>Terms of Service</Link>
+            <span 
+              onClick={() => handleLinkClick("/privacy")} 
+              style={{...legalLinkStyles, cursor: "pointer"}}
+            >
+              Privacy Policy
+            </span>
+            <span 
+              onClick={() => handleLinkClick("/terms")} 
+              style={{...legalLinkStyles, cursor: "pointer"}}
+            >
+              Terms of Service
+            </span>
           </div>
         </div>
       </div>
